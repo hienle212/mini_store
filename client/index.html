@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>
+  <head>
+    <meta charset="utf-8">
+    <title>Teams and Players</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-messages.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
+
+    <style type="text/css">
+    </style>
+    <script>
+
+
+    var myApp = angular.module('myApp', ['ngRoute', 'ngMessages'])
+
+//////////////////////*************************ROUTE**************///////////////////////
+
+    myApp.config(function($routeProvider){
+      $routeProvider
+      .when('/dashboards', {
+        templateUrl: 'partials/dashboard.html'
+      })
+      .when('/orders', {
+        templateUrl: 'partials/order.html'
+      })
+      .when('/customers', {
+        templateUrl: 'partials/customer.html'
+      })
+      .when('/products', {
+        templateUrl: 'partials/product.html'
+      })
+      .otherwise({
+        redirectTo: '/dashboards'
+      })
+    })
+//////////////////*************************FACTORY**************////////////////////////
+
+///// FACTORY (#DASHBOARD)
+
+    myApp.factory('DashboardFactory', function($http){
+
+      var factory = {};
+      factory.index = function(callback){
+        $http.get('/dashboard').success(function(data){
+          callback(data)
+        });
+      }
+
+      return factory
+    })
+
+
+///// FACTORY (#CUSTOMER)
+
+    myApp.factory('CustomerFactory', function($http){
+
+      var factory = {};
+      factory.index = function(callback){
+        $http.get('/customers').success(function(data){
+          callback(data)
+        });
+      }
+      factory.create = function(customer_info, callback){
+        $http.post('/customers', customer_info).success(function(data){
+            if(!data.status){
+              console.log(data)
+          }          
+          callback()
+        })
+      }
+      factory.delete = function(id, callback){
+        $http.delete('/customers/' + id).success(function(data){
+          callback()
+        })
+      }
+      return factory
+    })
+
+
+///// FACTORY (#ORDER)
+
+      myApp.factory('OrderFactory', function($http){
+
+      var factory = {};
+
+      factory.index = function(callback){
+        $http.get('/orders').success(function(data){
+          callback(data)
+        });
+      }
+      factory.create = function(order_info, callback){
+        $http.post('/orders', order_info).success(function(data){
+            if(!data.status){
+              console.log(data)
+          }          
+          callback()
+        })
+      }
+      factory.delete = function(id, callback){
+        $http.delete('/orders/' + id).success(function(data){
+          callback()
+        })
+      }
+      return factory
+    })
+
+///// FACTORY (#PRODUCT)
+
+      myApp.factory('ProductFactory', function($http){
+
+      var factory = {};
+
+      factory.index = function(callback){
+        $http.get('/products').success(function(data){
+          callback(data)
+        });
+      }
+      factory.create = function(product_info, callback){
+        $http.post('/products', product_info).success(function(data){
+            if(!data.status){
+              console.log(data)
+          }          
+          callback()
+        })
+      }
+      factory.delete = function(id, callback){
+        $http.delete('/products/' + id).success(function(data){
+          callback()
+        })
+      }
+      return factory
+    })
+
+////////////////////*************************CONTROLLER**************///////////////////
+
+///// CONTROLLER (#Customer)
+
+    myApp.controller('CustomersController', function(CustomerFactory, $scope) {
+
+      $scope.newCustomer = {};
+
+      var index = function(){
+        CustomerFactory.index(function(data){
+          $scope.customers = data
+        })
+      }
+      index();
+
+      $scope.create = function(){
+        CustomerFactory.create($scope.newCustomer, index);
+        console.log($scope.newCustomer)
+        $scope.newCustomer = {}
+      }
+
+      $scope.delete = function(id){
+        console.log(id)
+        CustomerFactory.delete(id, index);
+      }
+  })
+
+///// CONTROLLER (#PRODUCT)
+
+    myApp.controller('ProductsController', function(ProductFactory, OrderFactory, $scope) {
+
+      $scope.newProduct = {};
+
+      var index = function(){
+        ProductFactory.index(function(data){
+          $scope.products = data
+        })
+      }
+      index();
+
+      $scope.create = function(){
+        ProductFactory.create($scope.newProduct, index);
+        $scope.newProduct = {}
+      }
+
+      $scope.delete = function(id){
+        console.log(id)
+        ProductFactory.delete(id, index);
+      }
+  })   
+///// CONTROLLER (#ORDER)
+
+    myApp.controller('OrdersController', function(OrderFactory,CustomerFactory, ProductFactory, $scope) {
+
+      $scope.newOrder = {};
+
+      var Customer_index = function(){
+        CustomerFactory.index(function(data){
+          $scope.customers = data
+        })
+      }
+      Customer_index();
+
+      var Product_index = function(){
+        ProductFactory.index(function(data){
+          $scope.products = data
+        })
+      }
+      Product_index();
+
+      var index = function(){
+        OrderFactory.index(function(data){
+          $scope.orders = data
+        })
+      }
+      index();
+
+      $scope.create = function(){
+        OrderFactory.create($scope.newOrder, index);
+        console.log($scope.newOrder)
+        $scope.newOrder = {}
+      }
+
+      $scope.delete = function(id){
+        console.log(id)
+        OrderFactory.delete(id, index);
+      }
+  })  
+///// CONTROLLER (#dashboard)
+
+    myApp.controller('DashboardsController', function(OrderFactory,CustomerFactory, ProductFactory, DashboardFactory, $scope) {
+        $scope.today = new Date();
+
+      var Customer_index = function(){
+        CustomerFactory.index(function(data){
+          $scope.customers = data
+        })
+      }
+      Customer_index();
+
+      var Product_index = function(){
+        ProductFactory.index(function(data){
+          $scope.products = data
+        })
+      }
+      Product_index();
+
+    // angular.module('myApp').filter('moment', function () {
+    //     return function (input, momentFn /*, param1, param2, ...param n */) {
+    //     var args = Array.prototype.slice.call(arguments, 2),
+    //     momentObj = moment(input);
+    //     return momentObj[momentFn].apply(momentObj, args);
+    //   };
+    //   });
+    angular
+  .module('myApp')
+  .filter('timeAgo', ['$interval', function ($interval){
+    // trigger digest every 60 seconds
+    $interval(function (){}, 60000);
+
+    function fromNowFilter(time){
+      return moment(time).fromNow();
+    }
+
+    fromNowFilter.$stateful = true;
+    return fromNowFilter;
+  }]);
+
+      var Order_index = function(){
+        OrderFactory.index(function(data){
+          $scope.orders = data
+        })
+      }
+      Order_index();
+
+  })  
+    </script>
+  </head>
+  <body>
+<p><a href="#/dashboards"> Dashboard </a> | <a href="#/products"> Products </a> | <a href="#/customers"> Customers </a>|<a href="#/orders"> Orders </a> | <a href=""> Settings </a></p>
+  <div ng-view=''>
+
+  </div>
+  </body>
+</html>

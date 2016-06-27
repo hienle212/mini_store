@@ -1,0 +1,25 @@
+<div ng-controller="ProductsController">
+<div id="left">
+ <form>
+<input type="text" ng-model="filter_name" placeholder="search..">
+<button>Filter</button>
+</form> 
+
+<h1>Add a new Product</h1>
+<form>
+Name: <input type="text" ng-model="newProduct.product_name" name="product_name" placeholder="name..">
+Image (url) : <input type="text" ng-model="newProduct.image" name="image" placeholder="http://">
+Description : <input type="text" ng-model="newProduct.description" name="description" placeholder="write here..">
+Initial Quantity : <input type="number" name="quantity" min="1" max="50" name="quantity" ng-model="newProduct.quantity">
+<button ng-click="create()">Create</button>
+</form>
+</div>
+<div id="right" ng-repeat="product in products" >
+	<div class="info">
+<img src="{{product.image}}" width="42" height="42">
+<p>{{product.product_name}}</p>
+<p>{{product.quantity}}</p>
+	</div>
+</div>
+
+</div>

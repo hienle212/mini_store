@@ -1,0 +1,26 @@
+<div ng-controller="DashboardsController">
+ <form>
+<input type="text" ng-model="filter_name" placeholder="search..">
+<button>Filter</button>
+</form> 
+
+<div id="right" ng-repeat="product in products | limitTo:5" >
+<img src="{{product.image}}" width="42" height="42">
+<p>{{product.product_name}}</p>
+<p>{{product.quantity}}</p>
+</div>
+<a href="#/products">show more...</a>
+
+<h1>Recent Orders</h1>
+<div  ng-repeat="order in orders | limitTo:3" >
+<p>{{order.name}} purchased {{order.quantity}} {{order.product_name}} {{order.createdAt| date: "MM/dd/yyyy" }}</p>
+</div>
+<a href="#/orders">show all orders ...</a>
+
+<h1>New Customers</h1>
+<div  ng-repeat="customer in customers | limitTo:3" >
+<p>{{customer.name}} joined the store ({{customer.createdAt | date: "MM/dd/yyyy" }})</p>
+</div>
+<a href="#/customers">show all customers...</a>
+
+</div>
